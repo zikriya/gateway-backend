@@ -337,3 +337,113 @@ This route is used to update the latest version history record.
 - Parameters:
   - `id`: WalletByNetwork's unique identifier.
 - Response: Returns a success message upon successful deletion.
+
+# referralFeeManagement.ts
+
+##### 1\. `POST /create`
+
+typescript
+
+Copy code
+
+`router.post("/create", async (req: any, res: any) => {`
+
+- **Description**: This route is used to create a new referral fee management entry.
+- **Method**: `POST`
+- **Endpoint**: `/create`
+
+###### Request Validation
+
+typescript
+
+Copy code
+
+`if (
+      !req.body.tier ||
+      req.body.fee < 0 ||
+      req.body.discount < 0 ||
+      !req.body.feeType
+    ) {
+      return res.http400("tier, fee, discount, feeType are required.");
+    }`
+
+- **Validation**:
+  - Checks if `tier`, `fee`, `discount`, and `feeType` are provided in the request body.
+  - Ensures `fee` and `discount` are not negative values.
+- **Error Response**: Returns a 400 status with an error message if validation fails.
+
+###### Creating Referral Fee Management
+
+typescript
+
+Copy code
+
+`const referralFeeManagement = await db.ReferralFeeManagement.create(
+req.body
+);
+
+    return res.http200({ referralFeeManagement });
+
+});`
+
+- **Database Operation**: Uses `db.ReferralFeeManagement.create` to create a new entry with the provided request body data.
+- **Success Response**: Returns a 200 status with the created `referralFeeManagement` object.
+
+##### 2\. `PUT /update/:id`
+
+typescript
+
+Copy code
+
+`router.put("/update/:id", async (req: any, res: any) => {`
+
+- **Description**: This route updates an existing referral fee management entry.
+- **Method**: `PUT`
+- **Endpoint**: `/update/:id`
+
+###### Request Validation
+
+typescript
+
+Copy code
+
+`if (!req.params.id) {
+      return res.http400("id is required.");
+    }
+    if (
+      !req.body.tier ||
+      req.body.fee < 0 ||
+      req.body.discount < 0 ||
+      !req.body.feeType
+    ) {
+      return res.http400("tier, fee, discount, feeType are required.");
+    }`
+
+- **Validation**:
+  - Checks if `id` is provided in the URL parameters.
+  - Ensures `tier`, `fee`, `discount`, and `feeType` are provided in the request body.
+  - Ensures `fee` and `discount` are not negative values.
+- **Error Response**: Returns a 400 status with an error message if validation fails.
+
+###### Updating Referral Fee Management
+
+typescript
+
+Copy code
+
+`const referralFeeManagement =
+await db.ReferralFeeManagement.findOneAndUpdate(
+{ \_id: mongoose.Types.ObjectId(req.params.id) },
+{ ...req.body },
+{ new: true }
+);
+
+    return res.http200({ referralFeeManagement });
+
+});
+};`
+
+- **Database Operation**: Uses `db.ReferralFeeManagement.findOneAndUpdate` to update the entry identified by `id` with the provided request body data.
+  - Converts `id` to a MongoDB ObjectId.
+  - Returns the updated document with `{ new: true }` option.
+- **Success Response**: Returns a 200 status with the updated `referralFeeManagement` object.
